@@ -4,262 +4,265 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GateApp</title>
-
 <style>
-body{
-font-family:Arial,sans-serif;
-background:#f4f6f9;
-margin:0;
-padding:20px;
-}
-
-.container{
-max-width:600px;
-margin:auto;
-}
-
-.card{
-background:white;
-padding:15px;
-margin-bottom:15px;
-border-radius:15px;
-box-shadow:0 2px 10px rgba(0,0,0,.1);
-}
-
-h1{
-text-align:center;
-}
-
-input{
-width:100%;
-padding:12px;
-margin-top:8px;
-margin-bottom:8px;
-box-sizing:border-box;
-border:1px solid #ccc;
-border-radius:10px;
-}
-
-button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:10px;
-background:#007aff;
-color:white;
-font-size:16px;
-margin-top:5px;
-}
-
-.green{
-background:#34c759;
-}
-
-.red{
-background:#ff3b30;
-}
-
-ul{
-padding-right:20px;
-}
-
-li{
-margin:6px 0;
-}
+body{font-family:Arial,sans-serif;background:#f4f6f9;margin:0;padding:20px}
+.container{max-width:650px;margin:auto}
+.card{background:white;padding:15px;margin-bottom:15px;border-radius:15px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+h1{text-align:center}
+input,select,button{width:100%;padding:12px;margin:6px 0;box-sizing:border-box;border-radius:10px;border:1px solid #ccc;font-size:16px}
+button{background:#007aff;color:white;border:none;font-weight:bold}
+.green{background:#34c759}.red{background:#ff3b30}.gray{background:#666}
+.hidden{display:none}
+.ok{color:green;font-weight:bold}.bad{color:red;font-weight:bold}
+li{margin:8px 0}
+.small{font-size:13px;color:#666}
 </style>
 </head>
-
 <body>
 
 <div class="container">
-
 <h1>🚗 GateApp</h1>
 
+<div id="authBox" class="card">
+<h2>כניסה / יצירת משתמש</h2>
+
+<h3>התחברות</h3>
+<input id="loginUser" placeholder="שם משתמש">
+<input id="loginPass" type="password" placeholder="סיסמה">
+<button onclick="login()">התחבר</button>
+
+<hr>
+
+<h3>יצירת משתמש</h3>
+<input id="regUser" placeholder="שם משתמש חדש">
+<input id="regPass" type="password" placeholder="סיסמה">
+<input id="adminCode" placeholder="קוד אדמין אם יש">
+<button onclick="register()">צור משתמש</button>
+
+<p class="small">קוד אדמין: רק מי שמכניס 1501 ייווצר כ-admin.</p>
+<p id="authMsg"></p>
+</div>
+
+<div id="appBox" class="hidden">
+
 <div class="card">
-<h3>בדיקת כניסה</h3>
-
-<input id="plate" placeholder="מספר רכב">
-
-<input id="card" placeholder="כרטיס / קוד">
-
-<button onclick="checkAccess()">בדוק הרשאה</button>
-
-<p id="result"></p>
+<p>מחובר כ: <b id="currentUser"></b> | סוג: <b id="currentRole"></b></p>
+<button class="gray" onclick="logout()">התנתק</button>
 </div>
 
 <div class="card">
-<h3>רכבים מורשים</h3>
-
-<input id="newPlate" placeholder="הוסף רכב">
-
-<button onclick="addPlate()">הוסף</button>
-
-<ul id="plates"></ul>
+<h2>חיפוש אדם</h2>
+<input id="searchName" placeholder="חפש לפי שם">
+<button onclick="searchPerson()">חפש</button>
+<p id="searchResult"></p>
 </div>
 
 <div class="card">
-<h3>כרטיסים מורשים</h3>
+<h2>בדיקת כניסה</h2>
+<input id="checkName" placeholder="שם">
+<input id="checkPlate" placeholder="מספר רכב">
+<input id="checkCard" placeholder="מספר כרטיס / קוד">
+<button onclick="checkAccess()">בדוק כניסה</button>
+<p id="accessResult"></p>
+</div>
 
-<input id="newCard" placeholder="הוסף כרטיס">
+<div id="adminPanel" class="card hidden">
+<h2>ניהול הרשאות - Admin</h2>
 
-<button onclick="addCard()">הוסף</button>
+<input id="personName" placeholder="שם אדם">
+<input id="personPlate" placeholder="מספר רכב מורשה">
+<input id="personCard" placeholder="מספר כרטיס מורשה">
 
-<ul id="cards"></ul>
+<button onclick="addPerson()">הוסף אדם / הרשאה</button>
+
+<h3>רשימת מורשים</h3>
+<ul id="peopleList"></ul>
 </div>
 
 <div class="card">
-<h3>שער</h3>
-
-<button class="green" onclick="openGate()">פתח שער</button>
-</div>
-
-<div class="card">
-<h3>לוג כניסות</h3>
-
+<h2>לוג כניסות</h2>
 <button class="red" onclick="clearLogs()">נקה לוג</button>
-
-<ul id="logs"></ul>
+<ul id="logsList"></ul>
 </div>
 
+</div>
 </div>
 
 <script>
+const ADMIN_CODE = "1501";
 
-let plates =
-JSON.parse(localStorage.getItem("plates"))
-|| ["1234567"];
+let users = JSON.parse(localStorage.getItem("users")) || [
+  {username:"admin", password:"admin", role:"admin"}
+];
 
-let cards =
-JSON.parse(localStorage.getItem("cards"))
-|| ["1111"];
+let people = JSON.parse(localStorage.getItem("people")) || [
+  {name:"אייל", plate:"1234567", card:"1111"}
+];
 
-let logs =
-JSON.parse(localStorage.getItem("logs"))
-|| [];
+let logs = JSON.parse(localStorage.getItem("logs")) || [];
+let activeUser = JSON.parse(localStorage.getItem("activeUser")) || null;
 
 function save(){
-localStorage.setItem(
-"plates",
-JSON.stringify(plates)
-);
-
-localStorage.setItem(
-"cards",
-JSON.stringify(cards)
-);
-
-localStorage.setItem(
-"logs",
-JSON.stringify(logs)
-);
+  localStorage.setItem("users", JSON.stringify(users));
+  localStorage.setItem("people", JSON.stringify(people));
+  localStorage.setItem("logs", JSON.stringify(logs));
+  localStorage.setItem("activeUser", JSON.stringify(activeUser));
 }
 
 function render(){
+  if(activeUser){
+    authBox.classList.add("hidden");
+    appBox.classList.remove("hidden");
+    currentUser.innerText = activeUser.username;
+    currentRole.innerText = activeUser.role;
 
-document.getElementById("plates").innerHTML =
-plates.map(x=>`<li>${x}</li>`).join("");
+    if(activeUser.role === "admin"){
+      adminPanel.classList.remove("hidden");
+    } else {
+      adminPanel.classList.add("hidden");
+    }
+  } else {
+    authBox.classList.remove("hidden");
+    appBox.classList.add("hidden");
+  }
 
-document.getElementById("cards").innerHTML =
-cards.map(x=>`<li>${x}</li>`).join("");
+  peopleList.innerHTML = people.map((p,i)=>`
+    <li>
+      <b>${p.name}</b><br>
+      רכב: ${p.plate || "-"}<br>
+      כרטיס: ${p.card || "-"}<br>
+      <button class="red" onclick="deletePerson(${i})">מחק</button>
+    </li>
+  `).join("");
 
-document.getElementById("logs").innerHTML =
-logs.slice().reverse().map(x=>`<li>${x}</li>`).join("");
+  logsList.innerHTML = logs.slice().reverse().map(l=>`<li>${l}</li>`).join("");
 }
 
-function addPlate(){
+function register(){
+  let username = regUser.value.trim();
+  let password = regPass.value.trim();
+  let code = adminCode.value.trim();
 
-let p =
-document.getElementById("newPlate").value.trim();
+  if(!username || !password){
+    authMsg.innerHTML = "<span class='bad'>חסר שם משתמש או סיסמה</span>";
+    return;
+  }
 
-if(!p)return;
+  if(users.find(u=>u.username === username)){
+    authMsg.innerHTML = "<span class='bad'>שם המשתמש כבר קיים</span>";
+    return;
+  }
 
-plates.push(p);
+  let role = code === ADMIN_CODE ? "admin" : "user";
+  users.push({username,password,role});
+  save();
 
-save();
-render();
-
-document.getElementById("newPlate").value="";
+  authMsg.innerHTML = `<span class='ok'>משתמש נוצר בהצלחה כסוג: ${role}</span>`;
 }
 
-function addCard(){
+function login(){
+  let username = loginUser.value.trim();
+  let password = loginPass.value.trim();
 
-let c =
-document.getElementById("newCard").value.trim();
+  let user = users.find(u=>u.username === username && u.password === password);
 
-if(!c)return;
+  if(!user){
+    authMsg.innerHTML = "<span class='bad'>שם משתמש או סיסמה לא נכונים</span>";
+    return;
+  }
 
-cards.push(c);
-
-save();
-render();
-
-document.getElementById("newCard").value="";
+  activeUser = user;
+  save();
+  render();
 }
 
-function openGate(){
+function logout(){
+  activeUser = null;
+  save();
+  render();
+}
 
-let t =
-new Date().toLocaleString();
+function addPerson(){
+  if(activeUser.role !== "admin") return;
 
-logs.push(
-t+" - השער נפתח ידנית"
-);
+  let name = personName.value.trim();
+  let plate = personPlate.value.trim();
+  let card = personCard.value.trim();
 
-save();
-render();
+  if(!name){
+    alert("חייבים שם");
+    return;
+  }
 
-alert("השער נפתח");
+  people.push({name, plate, card});
+  save();
+  render();
+
+  personName.value="";
+  personPlate.value="";
+  personCard.value="";
+}
+
+function deletePerson(i){
+  if(activeUser.role !== "admin") return;
+  people.splice(i,1);
+  save();
+  render();
+}
+
+function searchPerson(){
+  let q = searchName.value.trim();
+
+  let found = people.filter(p =>
+    p.name.includes(q)
+  );
+
+  if(!q || found.length === 0){
+    searchResult.innerHTML = "<span class='bad'>לא נמצא אדם כזה</span>";
+    return;
+  }
+
+  searchResult.innerHTML = found.map(p=>`
+    <div>
+      ✅ <b>${p.name}</b><br>
+      רכב: ${p.plate || "-"}<br>
+      כרטיס: ${p.card || "-"}
+    </div>
+  `).join("<hr>");
 }
 
 function checkAccess(){
+  let name = checkName.value.trim();
+  let plate = checkPlate.value.trim();
+  let card = checkCard.value.trim();
 
-let p =
-document.getElementById("plate").value.trim();
+  let found = people.find(p =>
+    p.name === name ||
+    (plate && p.plate === plate) ||
+    (card && p.card === card)
+  );
 
-let c =
-document.getElementById("card").value.trim();
+  let time = new Date().toLocaleString("he-IL");
 
-let ok =
-plates.includes(p) ||
-cards.includes(c);
+  if(found){
+    accessResult.innerHTML = `<span class='ok'>✅ כניסה מאושרת: ${found.name}</span>`;
+    logs.push(`${time} - כניסה מאושרת - ${found.name}`);
+  } else {
+    accessResult.innerHTML = "<span class='bad'>❌ כניסה נדחתה</span>";
+    logs.push(`${time} - כניסה נדחתה`);
+  }
 
-let t =
-new Date().toLocaleString();
-
-if(ok){
-
-document.getElementById("result").innerHTML =
-"✅ כניסה מאושרת";
-
-logs.push(
-t+" - כניסה אושרה"
-);
-
-}else{
-
-document.getElementById("result").innerHTML =
-"❌ כניסה נדחתה";
-
-logs.push(
-t+" - כניסה נדחתה"
-);
-
-}
-
-save();
-render();
+  save();
+  render();
 }
 
 function clearLogs(){
-
-logs=[];
-
-save();
-render();
+  logs = [];
+  save();
+  render();
 }
 
 render();
-
 </script>
 
 </body>
