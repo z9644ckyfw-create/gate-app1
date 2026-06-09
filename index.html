@@ -6,128 +6,245 @@
 <title>GateApp</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
-  font-family:Arial,sans-serif;
-  background:linear-gradient(135deg,#eef2ff,#f8fafc);
   margin:0;
-  padding:20px;
-  color:#111827;
+  font-family:Arial,sans-serif;
+  background:#f2f2f2;
+  color:#1f1f1f;
 }
-.container{max-width:700px;margin:auto}
-h1{text-align:center;font-size:42px;margin:25px 0}
-.card{
-  background:rgba(255,255,255,.95);
+
+.app{
+  max-width:430px;
+  min-height:100vh;
+  margin:auto;
+  background:#f7f7f7;
   padding:22px;
+}
+
+.hero{
+  background:#1f1f1f;
+  color:white;
+  border-radius:0 0 38px 38px;
+  padding:34px 24px 42px;
+  margin:-22px -22px 24px;
+  position:relative;
+}
+
+.logo{
+  width:68px;
+  height:68px;
+  background:white;
+  color:#1f1f1f;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
   margin-bottom:22px;
-  border-radius:24px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:38px;
+  line-height:1.1;
+}
+
+.hero p{
+  color:#cfcfcf;
+  margin:10px 0 0;
+}
+
+.card{
+  background:white;
+  border-radius:28px;
+  padding:22px;
+  margin-bottom:20px;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
-h2{font-size:28px;margin-top:0}
-input,button{
+
+h2{
+  margin:0 0 18px;
+  font-size:25px;
+}
+
+h3{
+  margin:18px 0 8px;
+}
+
+input{
   width:100%;
   padding:15px;
   margin:8px 0;
-  box-sizing:border-box;
-  border-radius:14px;
-  border:1px solid #d1d5db;
-  font-size:17px;
-}
-input{background:#f9fafb}
-button{
-  background:#2563eb;
-  color:white;
   border:none;
+  border-bottom:1px solid #ddd;
+  background:#fafafa;
+  font-size:16px;
+  outline:none;
+}
+
+input:focus{
+  border-bottom:2px solid #111;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  margin:10px 0 0;
+  border:none;
+  border-radius:14px;
+  background:#1f1f1f;
+  color:white;
+  font-size:16px;
   font-weight:bold;
 }
-.green{background:#22c55e}
-.red{background:#ef4444}
-.gray{background:#6b7280}
+
+button.blue{background:#2563eb}
+button.red{background:#ef4444}
+button.gray{background:#666}
+
 .hidden{display:none}
+
 .ok{color:#16a34a;font-weight:bold}
 .bad{color:#dc2626;font-weight:bold}
-ul{padding:0}
-li{
-  background:#f9fafb;
-  padding:14px;
-  border-radius:14px;
-  margin:10px 0;
-  list-style:none;
-  border:1px solid #e5e7eb;
+.small{font-size:13px;color:#777}
+
+.userbar{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
 }
-.small{font-size:13px;color:#6b7280}
-hr{border:none;border-top:1px solid #e5e7eb;margin:18px 0}
+
+.badge{
+  background:#f1f1f1;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:bold;
+}
+
+.resultBox{
+  margin-top:14px;
+}
+
+.resultItem{
+  background:#f8f8f8;
+  padding:14px;
+  border-radius:18px;
+  margin:10px 0;
+  border:1px solid #eee;
+}
+
+.resultItem b{
+  font-size:18px;
+}
+
+ul{
+  padding:0;
+  margin:0;
+}
+
+li{
+  list-style:none;
+  background:#f8f8f8;
+  border-radius:18px;
+  padding:14px;
+  margin:10px 0;
+  border:1px solid #eee;
+}
+
+hr{
+  border:none;
+  border-top:1px solid #eee;
+  margin:18px 0;
+}
+
+.footerSpace{height:30px}
 </style>
 </head>
 
 <body>
-<div class="container">
-<h1>🚗 GateApp</h1>
+<div class="app">
+
+<div class="hero">
+  <div class="logo">🚗</div>
+  <h1>GateApp</h1>
+  <p>ניהול כניסות, רכבים ומורשים</p>
+</div>
 
 <div id="authBox" class="card">
-<h2>כניסה / יצירת משתמש</h2>
+  <h2>כניסה</h2>
 
-<h3>התחברות</h3>
-<input id="loginUser" placeholder="שם משתמש">
-<input id="loginPass" type="password" placeholder="סיסמה">
-<button onclick="login()">התחבר</button>
+  <input id="loginUser" placeholder="שם משתמש">
+  <input id="loginPass" type="password" placeholder="סיסמה">
+  <button onclick="login()">התחבר</button>
 
-<hr>
+  <hr>
 
-<h3>יצירת משתמש</h3>
-<input id="regUser" placeholder="שם משתמש חדש">
-<input id="regPass" type="password" placeholder="סיסמה">
-<input id="adminCode" placeholder="קוד אדמין אם יש">
-<button onclick="register()">צור משתמש</button>
+  <h3>יצירת משתמש</h3>
+  <input id="regUser" placeholder="שם משתמש חדש">
+  <input id="regPass" type="password" placeholder="סיסמה">
+  <input id="adminCode" placeholder="קוד אדמין אם יש">
+  <button class="blue" onclick="register()">צור משתמש</button>
 
-<p class="small">קוד אדמין יסופק רק למורשי גישה כ-admin.</p>
-<p id="authMsg"></p>
+  <p class="small">קוד אדמין הופך את המשתמש למנהל.</p>
+  <p id="authMsg"></p>
 </div>
 
 <div id="appBox" class="hidden">
 
-<div class="card">
-<p>מחובר כ: <b id="currentUser"></b> | סוג: <b id="currentRole"></b></p>
-<button class="gray" onclick="logout()">התנתק</button>
+  <div class="card">
+    <div class="userbar">
+      <div>
+        <div class="small">מחובר כ</div>
+        <b id="currentUser"></b>
+      </div>
+      <div class="badge" id="currentRole"></div>
+    </div>
+    <button class="gray" onclick="logout()">התנתק</button>
+  </div>
+
+  <div class="card">
+    <h2>חיפוש מהיר</h2>
+    <input id="liveSearch" placeholder="הקלד שם / מספר רכב / מספר אישי / כרטיס">
+    <div id="liveResults" class="resultBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>בדיקת כניסה</h2>
+    <input id="checkName" placeholder="שם">
+    <input id="checkPersonalId" placeholder="מספר אישי">
+    <input id="checkPlate" placeholder="מספר רכב">
+    <input id="checkCard" placeholder="מספר כרטיס / קוד">
+    <button onclick="checkAccess()">בדוק כניסה</button>
+    <p id="accessResult"></p>
+  </div>
+
+  <div id="adminPanel" class="card hidden">
+    <h2>ניהול מורשים</h2>
+
+    <input id="personName" placeholder="שם אדם">
+    <input id="personPersonalId" placeholder="מספר אישי">
+    <input id="personPlate" placeholder="מספר רכב מורשה">
+    <input id="personCard" placeholder="מספר כרטיס מורשה">
+
+    <button onclick="addPerson()">הוסף מורשה</button>
+
+    <h3>רשימת מורשים</h3>
+    <ul id="peopleList"></ul>
+  </div>
+
+  <div class="card">
+    <h2>לוג כניסות</h2>
+    <button class="red" onclick="clearLogs()">נקה לוג</button>
+    <ul id="logsList"></ul>
+  </div>
+
 </div>
 
-<div class="card">
-<h2>חיפוש אדם</h2>
-<input id="searchName" placeholder="חפש לפי שם / מספר אישי / מספר רכב / כרטיס">
-<button onclick="searchPerson()">חפש</button>
-<p id="searchResult"></p>
-</div>
-
-<div class="card">
-<h2>בדיקת כניסה</h2>
-<input id="checkName" placeholder="שם">
-<input id="checkPersonalId" placeholder="מספר אישי">
-<input id="checkPlate" placeholder="מספר רכב">
-<input id="checkCard" placeholder="מספר כרטיס / קוד">
-<button onclick="checkAccess()">בדוק כניסה</button>
-<p id="accessResult"></p>
-</div>
-
-<div id="adminPanel" class="card hidden">
-<h2>ניהול הרשאות - Admin</h2>
-
-<input id="personName" placeholder="שם אדם">
-<input id="personPersonalId" placeholder="מספר אישי">
-<input id="personPlate" placeholder="מספר רכב מורשה">
-<input id="personCard" placeholder="מספר כרטיס מורשה">
-
-<button onclick="addPerson()">הוסף אדם / הרשאה</button>
-
-<h3>רשימת מורשים</h3>
-<ul id="peopleList"></ul>
-</div>
-
-<div class="card">
-<h2>לוג כניסות</h2>
-<button class="red" onclick="clearLogs()">נקה לוג</button>
-<ul id="logsList"></ul>
-</div>
-
-</div>
+<div class="footerSpace"></div>
 </div>
 
 <script type="module">
@@ -178,6 +295,44 @@ async function save(){
   localStorage.setItem("activeUser", JSON.stringify(activeUser));
 }
 
+function matchPerson(p,q){
+  return (
+    (p.name && p.name.includes(q)) ||
+    (p.personalId && p.personalId.includes(q)) ||
+    (p.plate && p.plate.includes(q)) ||
+    (p.card && p.card.includes(q))
+  );
+}
+
+function personHTML(p){
+  return `
+    <div class="resultItem">
+      ✅ <b>${p.name}</b><br>
+      מספר אישי: ${p.personalId || "-"}<br>
+      רכב: ${p.plate || "-"}<br>
+      כרטיס: ${p.card || "-"}
+    </div>
+  `;
+}
+
+function renderLiveSearch(){
+  let q = liveSearch.value.trim();
+
+  if(!q){
+    liveResults.innerHTML = "<span class='small'>התחל להקליד כדי לראות תוצאות...</span>";
+    return;
+  }
+
+  let found = people.filter(p => matchPerson(p,q));
+
+  if(found.length === 0){
+    liveResults.innerHTML = "<span class='bad'>לא נמצאו תוצאות</span>";
+    return;
+  }
+
+  liveResults.innerHTML = found.map(personHTML).join("");
+}
+
 function render(){
   if(activeUser){
     authBox.classList.add("hidden");
@@ -206,6 +361,10 @@ function render(){
   `).join("");
 
   logsList.innerHTML = logs.slice().reverse().map(l=>`<li>${l}</li>`).join("");
+
+  if(document.getElementById("liveSearch")){
+    renderLiveSearch();
+  }
 }
 
 window.register = async function(){
@@ -282,31 +441,6 @@ window.deletePerson = async function(i){
   render();
 };
 
-window.searchPerson = function(){
-  let q = searchName.value.trim();
-
-  let found = people.filter(p =>
-    (p.name && p.name.includes(q)) ||
-    (p.personalId && p.personalId.includes(q)) ||
-    (p.plate && p.plate.includes(q)) ||
-    (p.card && p.card.includes(q))
-  );
-
-  if(!q || found.length === 0){
-    searchResult.innerHTML = "<span class='bad'>לא נמצא אדם כזה</span>";
-    return;
-  }
-
-  searchResult.innerHTML = found.map(p=>`
-    <div>
-      ✅ <b>${p.name}</b><br>
-      מספר אישי: ${p.personalId || "-"}<br>
-      רכב: ${p.plate || "-"}<br>
-      כרטיס: ${p.card || "-"}
-    </div>
-  `).join("<hr>");
-};
-
 window.checkAccess = async function(){
   let name = checkName.value.trim();
   let personalId = checkPersonalId.value.trim();
@@ -339,6 +473,12 @@ window.clearLogs = async function(){
   await save();
   render();
 };
+
+document.addEventListener("input", function(e){
+  if(e.target && e.target.id === "liveSearch"){
+    renderLiveSearch();
+  }
+});
 
 loadData();
 </script>
