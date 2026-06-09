@@ -88,24 +88,51 @@ li{margin:8px 0}
 </div>
 </div>
 
-<script>
+<<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDxRC4OSHlZbC5hst82WyxwGtsllot5nsA",
+  authDomain: "gate-app1.firebaseapp.com",
+  projectId: "gate-app1",
+  storageBucket: "gate-app1.firebasestorage.app",
+  messagingSenderId: "456292609349",
+  appId: "1:456292609349:web:abd270156df0d663c1a22c",
+  measurementId: "G-WQE0VHW1KM"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const dataRef = doc(db, "gateApp", "mainData");
+
 const ADMIN_CODE = "1501";
 
-let users = JSON.parse(localStorage.getItem("users")) || [
-  {username:"admin", password:"admin", role:"admin"}
-];
-
-let people = JSON.parse(localStorage.getItem("people")) || [
-  {name:"אייל", plate:"1234567", card:"1111"}
-];
-
-let logs = JSON.parse(localStorage.getItem("logs")) || [];
+let users = [];
+let people = [];
+let logs = [];
 let activeUser = JSON.parse(localStorage.getItem("activeUser")) || null;
 
-function save(){
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("people", JSON.stringify(people));
-  localStorage.setItem("logs", JSON.stringify(logs));
+async function loadData(){
+  const snap = await getDoc(dataRef);
+
+  if(snap.exists()){
+    const data = snap.data();
+    users = data.users || [];
+    people = data.people || [];
+    logs = data.logs || [];
+  } else {
+    users = [{username:"admin", password:"admin", role:"admin"}];
+    people = [{name:"אייל", plate:"1234567", card:"1111"}];
+    logs = [];
+    await save();
+  }
+
+  render();
+}
+
+async function save(){
+  await setDoc(dataRef, {users, people, logs});
   localStorage.setItem("activeUser", JSON.stringify(activeUser));
 }
 
@@ -138,7 +165,7 @@ function render(){
   logsList.innerHTML = logs.slice().reverse().map(l=>`<li>${l}</li>`).join("");
 }
 
-function register(){
+window.register = async function(){
   let username = regUser.value.trim();
   let password = regPass.value.trim();
   let code = adminCode.value.trim();
@@ -155,12 +182,12 @@ function register(){
 
   let role = code === ADMIN_CODE ? "admin" : "user";
   users.push({username,password,role});
-  save();
+  await save();
 
   authMsg.innerHTML = `<span class='ok'>משתמש נוצר בהצלחה כסוג: ${role}</span>`;
-}
+};
 
-function login(){
+window.login = function(){
   let username = loginUser.value.trim();
   let password = loginPass.value.trim();
 
@@ -172,17 +199,17 @@ function login(){
   }
 
   activeUser = user;
-  save();
+  localStorage.setItem("activeUser", JSON.stringify(activeUser));
   render();
-}
+};
 
-function logout(){
+window.logout = function(){
   activeUser = null;
-  save();
+  localStorage.removeItem("activeUser");
   render();
-}
+};
 
-function addPerson(){
+window.addPerson = async function(){
   if(activeUser.role !== "admin") return;
 
   let name = personName.value.trim();
@@ -195,27 +222,25 @@ function addPerson(){
   }
 
   people.push({name, plate, card});
-  save();
+  await save();
   render();
 
   personName.value="";
   personPlate.value="";
   personCard.value="";
-}
+};
 
-function deletePerson(i){
+window.deletePerson = async function(i){
   if(activeUser.role !== "admin") return;
   people.splice(i,1);
-  save();
+  await save();
   render();
-}
+};
 
-function searchPerson(){
+window.searchPerson = function(){
   let q = searchName.value.trim();
 
-  let found = people.filter(p =>
-    p.name.includes(q)
-  );
+  let found = people.filter(p => p.name.includes(q));
 
   if(!q || found.length === 0){
     searchResult.innerHTML = "<span class='bad'>לא נמצא אדם כזה</span>";
@@ -229,9 +254,9 @@ function searchPerson(){
       כרטיס: ${p.card || "-"}
     </div>
   `).join("<hr>");
-}
+};
 
-function checkAccess(){
+window.checkAccess = async function(){
   let name = checkName.value.trim();
   let plate = checkPlate.value.trim();
   let card = checkCard.value.trim();
@@ -252,17 +277,17 @@ function checkAccess(){
     logs.push(`${time} - כניסה נדחתה`);
   }
 
-  save();
+  await save();
   render();
-}
+};
 
-function clearLogs(){
+window.clearLogs = async function(){
   logs = [];
-  save();
+  await save();
   render();
-}
+};
 
-render();
+loadData();
 </script>
 
 </body>
