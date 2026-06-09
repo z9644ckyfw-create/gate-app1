@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GateApp</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f6f9;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+}
+
+.card{
+background:white;
+padding:15px;
+margin-bottom:15px;
+border-radius:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:8px;
+box-sizing:border-box;
+border:1px solid #ccc;
+border-radius:10px;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#007aff;
+color:white;
+font-size:16px;
+margin-top:5px;
+}
+
+.green{
+background:#34c759;
+}
+
+.red{
+background:#ff3b30;
+}
+
+ul{
+padding-right:20px;
+}
+
+li{
+margin:6px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚗 GateApp</h1>
+
+<div class="card">
+<h3>בדיקת כניסה</h3>
+
+<input id="plate" placeholder="מספר רכב">
+
+<input id="card" placeholder="כרטיס / קוד">
+
+<button onclick="checkAccess()">בדוק הרשאה</button>
+
+<p id="result"></p>
+</div>
+
+<div class="card">
+<h3>רכבים מורשים</h3>
+
+<input id="newPlate" placeholder="הוסף רכב">
+
+<button onclick="addPlate()">הוסף</button>
+
+<ul id="plates"></ul>
+</div>
+
+<div class="card">
+<h3>כרטיסים מורשים</h3>
+
+<input id="newCard" placeholder="הוסף כרטיס">
+
+<button onclick="addCard()">הוסף</button>
+
+<ul id="cards"></ul>
+</div>
+
+<div class="card">
+<h3>שער</h3>
+
+<button class="green" onclick="openGate()">פתח שער</button>
+</div>
+
+<div class="card">
+<h3>לוג כניסות</h3>
+
+<button class="red" onclick="clearLogs()">נקה לוג</button>
+
+<ul id="logs"></ul>
+</div>
+
+</div>
+
+<script>
+
+let plates =
+JSON.parse(localStorage.getItem("plates"))
+|| ["1234567"];
+
+let cards =
+JSON.parse(localStorage.getItem("cards"))
+|| ["1111"];
+
+let logs =
+JSON.parse(localStorage.getItem("logs"))
+|| [];
+
+function save(){
+localStorage.setItem(
+"plates",
+JSON.stringify(plates)
+);
+
+localStorage.setItem(
+"cards",
+JSON.stringify(cards)
+);
+
+localStorage.setItem(
+"logs",
+JSON.stringify(logs)
+);
+}
+
+function render(){
+
+document.getElementById("plates").innerHTML =
+plates.map(x=>`<li>${x}</li>`).join("");
+
+document.getElementById("cards").innerHTML =
+cards.map(x=>`<li>${x}</li>`).join("");
+
+document.getElementById("logs").innerHTML =
+logs.slice().reverse().map(x=>`<li>${x}</li>`).join("");
+}
+
+function addPlate(){
+
+let p =
+document.getElementById("newPlate").value.trim();
+
+if(!p)return;
+
+plates.push(p);
+
+save();
+render();
+
+document.getElementById("newPlate").value="";
+}
+
+function addCard(){
+
+let c =
+document.getElementById("newCard").value.trim();
+
+if(!c)return;
+
+cards.push(c);
+
+save();
+render();
+
+document.getElementById("newCard").value="";
+}
+
+function openGate(){
+
+let t =
+new Date().toLocaleString();
+
+logs.push(
+t+" - השער נפתח ידנית"
+);
+
+save();
+render();
+
+alert("השער נפתח");
+}
+
+function checkAccess(){
+
+let p =
+document.getElementById("plate").value.trim();
+
+let c =
+document.getElementById("card").value.trim();
+
+let ok =
+plates.includes(p) ||
+cards.includes(c);
+
+let t =
+new Date().toLocaleString();
+
+if(ok){
+
+document.getElementById("result").innerHTML =
+"✅ כניסה מאושרת";
+
+logs.push(
+t+" - כניסה אושרה"
+);
+
+}else{
+
+document.getElementById("result").innerHTML =
+"❌ כניסה נדחתה";
+
+logs.push(
+t+" - כניסה נדחתה"
+);
+
+}
+
+save();
+render();
+}
+
+function clearLogs(){
+
+logs=[];
+
+save();
+render();
+}
+
+render();
+
+</script>
+
+</body>
+</html>
